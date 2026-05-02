@@ -1,0 +1,408 @@
+<!-- Leaflet.js CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<style>
+    body {
+        overflow: hidden;
+    }
+
+    main.container {
+        max-width: 100% !important;
+        padding: 0 !important;
+    }
+
+    .bh-footer {
+        display: none;
+    }
+
+    #mapWrap {
+        display: flex;
+        height: calc(100vh - 69px);
+        position: relative;
+    }
+
+    /* ── Sidebar ── */
+    #mapSidebar {
+        width: 320px;
+        min-width: 300px;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        flex-shrink: 0;
+        z-index: 1;
+    }
+
+    #sidebarHeader {
+        padding: 1.1rem 1.1rem 0.7rem;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+    }
+
+    #sidebarTitle {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 0.2rem;
+    }
+
+    #sidebarCount {
+        font-size: 0.75rem;
+        color: var(--muted);
+    }
+
+    #venueList {
+        overflow-y: auto;
+        flex: 1;
+        padding: 0.6rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+    }
+
+    .venue-card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 0.8rem 0.9rem;
+        cursor: pointer;
+        transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .venue-card:hover,
+    .venue-card.active {
+        border-color: var(--green);
+        transform: translateX(3px);
+    }
+
+    .venue-card-name {
+        font-weight: 700;
+        font-size: 0.87rem;
+        color: var(--text);
+    }
+
+    .venue-card-loc {
+        font-size: 0.73rem;
+        color: var(--muted);
+        margin: 0.1rem 0 0.35rem;
+    }
+
+    .venue-card-price {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--green);
+    }
+
+    .no-venue-msg {
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.83rem;
+        padding: 2rem 0.75rem;
+        line-height: 1.6;
+    }
+
+    /* ── Map ── */
+    #map {
+        flex: 1;
+    }
+
+    /* ── Mobile toggle ── */
+    #sidebarToggle {
+        display: none;
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 999;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+        color: var(--text);
+        cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+        #mapSidebar {
+            display: none;
+        }
+
+        #sidebarToggle {
+            display: block;
+        }
+
+        #mapSidebar.show {
+            display: flex;
+            position: absolute;
+            z-index: 100;
+            top: 0;
+            left: 0;
+            height: 100%;
+        }
+    }
+
+    /* Search input override */
+    #searchInput {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    /* Leaflet popup custom style */
+    .leaflet-popup-content-wrapper {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .leaflet-popup-content {
+        margin: 0;
+        min-width: 210px;
+    }
+
+    .leaflet-popup-tip-container {
+        display: none;
+    }
+
+    .bh-popup {
+        font-family: 'Inter', sans-serif;
+        padding: 1rem;
+    }
+
+    .bh-popup-name {
+        font-size: 0.97rem;
+        font-weight: 800;
+        color: #0b0f1a;
+        margin-bottom: 0.2rem;
+    }
+
+    .bh-popup-loc {
+        font-size: 0.73rem;
+        color: #64748b;
+        margin-bottom: 0.45rem;
+    }
+
+    .bh-popup-price {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: #16a34a;
+        margin-bottom: 0.5rem;
+    }
+
+    .bh-popup-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 0.65rem;
+    }
+
+    .bh-popup-tag {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 4px;
+        padding: 2px 7px;
+        font-size: 0.68rem;
+        color: #166534;
+    }
+
+    .bh-popup-btn {
+        display: block;
+        text-align: center;
+        background: #22c55e;
+        color: #fff !important;
+        border-radius: 7px;
+        padding: 8px;
+        font-size: 0.83rem;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .bh-popup-btn:hover {
+        background: #16a34a;
+    }
+</style>
+
+<div id="mapWrap">
+    <button id="sidebarToggle" onclick="document.getElementById('mapSidebar').classList.toggle('show')">☰
+        Venues</button>
+
+    <div id="mapSidebar">
+        <div id="sidebarHeader">
+            <div id="sidebarTitle">🏏 Registered Venues</div>
+            <div id="sidebarCount">Loading...</div>
+            <input id="searchInput" class="bh-input" type="text" placeholder="Search venues..."
+                style="height:34px;font-size:0.82rem;" oninput="filterCards()" />
+        </div>
+        <div id="venueList">
+            <div class="no-venue-msg">Loading venues...</div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+</div>
+
+<!-- Server-side user data injected safely — VS Code ignores non-JS script types -->
+<script type="application/json"
+    id="__bh_user__"><%- JSON.stringify(currentUser ? { role: currentUser.role } : null) %></script>
+
+<!-- Leaflet.js -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    let map;
+    let allVenues = [];
+    let markers = [];
+    let activeCard = null;
+
+    // Read server-injected user data from the JSON script tag (no lint errors this way)
+    window.__BH_USER__ = JSON.parse(document.getElementById('__bh_user__').textContent || 'null');
+
+    // ── Custom green marker icon ─────────────────────────────────────────────────
+    const greenIcon = L.divIcon({
+        className: '',
+        html: `<div style="
+      width:22px;height:22px;
+      background:#22c55e;
+      border:3px solid #fff;
+      border-radius:50%;
+      box-shadow:0 2px 8px rgba(0,0,0,0.4);
+    "></div>`,
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
+        popupAnchor: [0, -14]
+    });
+
+    const activeIcon = L.divIcon({
+        className: '',
+        html: `<div style="
+      width:28px;height:28px;
+      background:#16a34a;
+      border:3px solid #fff;
+      border-radius:50%;
+      box-shadow:0 3px 12px rgba(34,197,94,0.5);
+    "></div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+        popupAnchor: [0, -16]
+    });
+
+    // ── Init Map ─────────────────────────────────────────────────────────────────
+    async function initMap() {
+        map = L.map('map', { zoomControl: false }).setView([22.5, 78.5], 5);
+
+        // Colorful tiles — CartoDB Voyager (free, no key needed)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        // Move zoom controls to bottom-right
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // Fetch only venues with GPS coordinates
+        const res = await fetch('/boxes/api/map-data');
+        allVenues = await res.json();
+
+        renderMarkers(allVenues);
+        renderSidebar(allVenues);
+
+        // Fit to markers if any
+        if (allVenues.length > 0) {
+            const group = L.featureGroup(markers);
+            map.fitBounds(group.getBounds().pad(0.15));
+        }
+    }
+
+    // ── Render Markers ───────────────────────────────────────────────────────────
+    function renderMarkers(venues) {
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
+
+        venues.forEach((venue, i) => {
+            const marker = L.marker([venue.latitude, venue.longitude], { icon: greenIcon })
+                .addTo(map);
+
+            const currentUser = window.__BH_USER__;
+            const btnHtml = currentUser && currentUser.role === 'user'
+                ? `<a class="bh-popup-btn" href="/boxes/${venue._id}">🏏 View &amp; Book</a>`
+                : currentUser
+                    ? `<a class="bh-popup-btn" href="/boxes/${venue._id}">View Venue</a>`
+                    : `<a class="bh-popup-btn" href="/auth/login">Login to Book</a>`;
+
+            const facilities = (venue.facilities || []).slice(0, 3);
+            const tagsHtml = facilities.map(f => `<span class="bh-popup-tag">${f}</span>`).join('');
+
+            marker.bindPopup(`
+        <div class="bh-popup">
+          <div class="bh-popup-name">${venue.name}</div>
+          <div class="bh-popup-loc">📍 ${venue.location}, ${venue.city}</div>
+          <div class="bh-popup-price">₹${venue.pricePerHour}/hr</div>
+          ${tagsHtml ? `<div class="bh-popup-tags">${tagsHtml}</div>` : ''}
+          ${btnHtml}
+        </div>
+      `, { maxWidth: 240, minWidth: 210 });
+
+            marker.on('click', () => highlightCard(venue._id));
+            markers.push(marker);
+        });
+    }
+
+    // ── Render Sidebar ───────────────────────────────────────────────────────────
+    function renderSidebar(venues) {
+        const list = document.getElementById('venueList');
+        document.getElementById('sidebarCount').textContent =
+            venues.length + ' venue' + (venues.length !== 1 ? 's' : '') + ' on map';
+
+        if (venues.length === 0) {
+            list.innerHTML = `<div class="no-venue-msg">
+        🏟️ No venues with GPS coordinates yet.<br/>
+        <small>Add Latitude &amp; Longitude when creating a venue in Admin panel.</small>
+      </div>`;
+            return;
+        }
+
+        list.innerHTML = venues.map((v, i) => `
+      <div class="venue-card" id="vc-${v._id}" onclick="focusVenue(${i})">
+        <div class="venue-card-name">${v.name}</div>
+        <div class="venue-card-loc">📍 ${v.location}, ${v.city}</div>
+        <div class="venue-card-price">₹${v.pricePerHour}/hr</div>
+      </div>
+    `).join('');
+    }
+
+    // ── Focus a venue from sidebar ───────────────────────────────────────────────
+    function focusVenue(idx) {
+        const venue = allVenues[idx];
+        map.flyTo([venue.latitude, venue.longitude], 15, { animate: true, duration: 0.8 });
+        markers[idx].openPopup();
+        highlightCard(venue._id);
+    }
+
+    function highlightCard(id) {
+        if (activeCard) activeCard.classList.remove('active');
+        const card = document.getElementById('vc-' + id);
+        if (card) {
+            card.classList.add('active');
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            activeCard = card;
+        }
+    }
+
+    // ── Search filter ────────────────────────────────────────────────────────────
+    function filterCards() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = allVenues.filter(v =>
+            v.name.toLowerCase().includes(q) ||
+            v.city.toLowerCase().includes(q) ||
+            v.location.toLowerCase().includes(q)
+        );
+        renderSidebar(filtered);
+        renderMarkers(filtered);
+    }
+
+    // Start when DOM is ready
+    document.addEventListener('DOMContentLoaded', initMap);
+</script>

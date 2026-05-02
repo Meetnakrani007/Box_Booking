@@ -1,0 +1,121 @@
+<div class="bh-page-header">
+    <div>
+        <h1 class="bh-page-title">Find a Venue</h1>
+        <p style="color:var(--muted);margin-top:0.25rem;">
+            <%= pagination.total %> venue<%= pagination.total !==1 ? 's' : '' %> available
+        </p>
+    </div>
+    <a href="/boxes/map" class="btn-bh-outline btn-bh-sm"
+        style="display:inline-flex;align-items:center;gap:0.5rem;white-space:nowrap;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+            <circle cx="12" cy="10" r="3" />
+        </svg>
+        🗺️ Map View
+    </a>
+</div>
+
+
+<!-- Filter Bar -->
+<form class="bh-filter-bar" method="GET" action="/boxes">
+    <div class="bh-form-group">
+        <label class="bh-label">Search</label>
+        <input type="text" name="q" class="bh-input" placeholder="Venue name..." value="<%= filters.q %>" />
+    </div>
+    <div class="bh-form-group">
+        <label class="bh-label">City</label>
+        <select name="city" class="bh-select">
+            <option value="">All Cities</option>
+            <% cities.forEach(function(c) { %>
+                <option value="<%= c %>" <%=filters.city===c ? 'selected' : '' %>><%= c %>
+                </option>
+                <% }) %>
+        </select>
+    </div>
+    <div class="bh-form-group">
+        <label class="bh-label">Max ₹/hr</label>
+        <input type="number" name="maxPrice" class="bh-input" placeholder="Any price" value="<%= filters.maxPrice %>"
+            min="0" />
+    </div>
+    <div class="bh-form-group">
+        <label class="bh-label">Facility</label>
+        <select name="facility" class="bh-select">
+            <option value="">Any Facility</option>
+            <% facilities.forEach(function(f) { %>
+                <option value="<%= f %>" <%=filters.facility===f ? 'selected' : '' %>><%= f %>
+                </option>
+                <% }) %>
+        </select>
+    </div>
+    <div class="bh-form-group" style="flex:0 0 auto;">
+        <label class="bh-label">&nbsp;</label>
+        <button type="submit" class="btn-bh-primary" style="white-space:nowrap;padding:0.72rem 1.5rem;">🔍
+            Search</button>
+    </div>
+</form>
+
+<!-- Cards Grid -->
+<% if (!boxes || boxes.length===0) { %>
+    <div class="bh-section">
+        <div class="bh-empty">
+            <span class="bh-empty-icon">🏟️</span>
+            No venues match your filters. Try adjusting the search criteria.
+        </div>
+    </div>
+    <% } else { %>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+            <% boxes.forEach(function(box, i) { %>
+                <div class="col fade-up" style="animation-delay:<%=(i*0.05)%>s;">
+                    <div class="bh-card h-100">
+                        <% if (box.images && box.images.length> 0) { %>
+                            <img src="<%= box.images[0] %>" class="bh-card-img" alt="<%= box.name %>" />
+                            <% } else { %>
+                                <div class="bh-card-placeholder">🏏</div>
+                                <% } %>
+                                    <div class="bh-card-body">
+                                        <div class="d-flex align-items-start justify-content-between mb-1">
+                                            <h3 class="bh-card-title mb-0">
+                                                <%= box.name %>
+                                            </h3>
+                                            <span class="bh-price ms-2" style="white-space:nowrap;">₹<%=
+                                                    box.pricePerHour %><span class="bh-price-unit">/hr</span></span>
+                                        </div>
+                                        <p class="bh-card-location">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor"
+                                                stroke-width="2" style="margin-right:3px;" viewBox="0 0 24 24">
+                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                                                <circle cx="12" cy="10" r="3" />
+                                            </svg>
+                                            <%= box.location %>, <%= box.city %>
+                                        </p>
+                                        <div class="mb-3">
+                                            <% (box.facilities || []).slice(0,3).forEach(function(f) { %>
+                                                <span class="bh-badge-facility me-1 mb-1">
+                                                    <%= f %>
+                                                </span>
+                                                <% }) %>
+                                                    <% if (box.facilities && box.facilities.length> 3) { %>
+                                                        <span style="color:var(--muted);font-size:0.72rem;">+<%=
+                                                                box.facilities.length-3 %></span>
+                                                        <% } %>
+                                        </div>
+                                        <a href="/boxes/<%= box._id %>" class="btn-bh-outline"
+                                            style="display:block;text-align:center;">View Details</a>
+                                    </div>
+                    </div>
+                </div>
+                <% }) %>
+        </div>
+
+        <!-- Pagination -->
+        <% if (pagination.totalPages> 1) { %>
+            <div class="bh-pagination">
+                <% for (let i=1; i <=pagination.totalPages; i++) { %>
+                    <a class="bh-page-btn <%= pagination.page === i ? 'active' : '' %>"
+                        href="/boxes?page=<%= i %>&city=<%= filters.city %>&maxPrice=<%= filters.maxPrice %>&facility=<%= filters.facility %>&q=<%= filters.q %>">
+                        <%= i %>
+                    </a>
+                    <% } %>
+            </div>
+            <% } %>
+                <% } %>

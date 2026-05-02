@@ -1,0 +1,83 @@
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="bh-auth-card">
+            <div style="text-align:center;margin-bottom:1.5rem;">
+                <div style="font-size:3rem;margin-bottom:0.5rem;">💳</div>
+                <h2 class="bh-auth-title">Complete Payment</h2>
+                <p class="bh-auth-subtitle">Secure payment via Razorpay</p>
+            </div>
+
+            <div
+                style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius-sm);padding:1.25rem;margin-bottom:1.5rem;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                    <span style="color:var(--muted);font-size:0.875rem;">Venue</span>
+                    <span style="font-weight:600;">
+                        <%= booking.box ? booking.box.name : '' %>
+                    </span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                    <span style="color:var(--muted);font-size:0.875rem;">Date & Time</span>
+                    <span style="font-weight:600;">
+                        <%= booking.date %> · <%= booking.startTime %> – <%= booking.endTime %>
+                    </span>
+                </div>
+                <hr class="bh-divider" style="margin:0.75rem 0;" />
+                <div style="display:flex;justify-content:space-between;">
+                    <span style="font-weight:700;">Total Amount</span>
+                    <span style="color:var(--green);font-size:1.3rem;font-weight:800;">₹<%= booking.totalAmount %>
+                    </span>
+                </div>
+            </div>
+
+            <button id="rzpPayBtn" class="btn-bh-primary" style="width:100%;padding:1rem;font-size:1rem;">
+                Pay ₹<%= booking.totalAmount %> Now →
+            </button>
+
+            <form id="verifyForm" action="/bookings/<%= booking._id %>/verify" method="POST" style="display:none;">
+                <input type="hidden" name="razorpay_payment_id" id="rzp_payment_id" />
+                <input type="hidden" name="razorpay_order_id" id="rzp_order_id" />
+                <input type="hidden" name="razorpay_signature" id="rzp_signature" />
+            </form>
+
+            <p style="text-align:center;font-size:0.75rem;color:var(--muted);margin-top:1rem;">
+                🔒 Secured by Razorpay · Your payment info is encrypted
+            </p>
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script type="application/json" id="__bh_checkout_data__">
+    <%- JSON.stringify({
+        keyId: keyId,
+        amount: order.amount,
+        orderId: order.id,
+        user: currentUser ? { name: currentUser.name, email: currentUser.email } : null
+    }) %>
+</script>
+
+<script>
+    document.getElementById('rzpPayBtn').addEventListener('click', function () {
+        var data = JSON.parse(document.getElementById('__bh_checkout_data__').textContent);
+        var opts = {
+            key: data.keyId,
+            amount: data.amount,
+            currency: 'INR',
+            name: 'BoxHook',
+            description: 'Box Cricket Booking',
+            order_id: data.orderId,
+            handler: function (response) {
+                document.getElementById('rzp_payment_id').value = response.razorpay_payment_id;
+                document.getElementById('rzp_order_id').value = response.razorpay_order_id;
+                document.getElementById('rzp_signature').value = response.razorpay_signature;
+                document.getElementById('verifyForm').submit();
+            },
+            prefill: {
+                name: data.user ? data.user.name : "",
+                email: data.user ? data.user.email : ""
+            },
+            theme: { color: '#22c55e' }
+        };
+        new Razorpay(opts).open();
+    });
+</script>

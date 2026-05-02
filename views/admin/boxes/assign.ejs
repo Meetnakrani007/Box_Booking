@@ -1,0 +1,55 @@
+<div class="bh-page-header">
+  <div>
+    <a href="/admin/dashboard"
+      style="color:var(--muted);font-size:0.85rem;display:inline-flex;align-items:center;gap:0.4rem;text-decoration:none;margin-bottom:0.75rem;">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M19 12H5M12 5l-7 7 7 7" />
+      </svg>
+      Back to Dashboard
+    </a>
+    <h1 class="bh-page-title">Assign Venue to Owner</h1>
+    <p style="color:var(--muted);margin-top:0.25rem;">Link a venue with an owner so they can manage bookings</p>
+  </div>
+</div>
+
+<div class="row justify-content-start">
+  <div class="col-lg-6">
+    <div class="bh-section">
+      <div class="bh-section-head"><span class="bh-section-title">🔗 Assignment</span></div>
+      <div class="bh-section-body">
+        <form action="/admin/boxes/assign" method="POST">
+
+          <div class="bh-form-group">
+            <label class="bh-label">Select Venue *</label>
+            <select name="boxId" class="bh-select" required>
+              <option value="">-- Choose a venue --</option>
+              <% boxes.forEach(function(box) { %>
+                <option value="<%= box._id %>">
+                  <%= box.name %> — <%= box.city %>
+                </option>
+                <% }) %>
+            </select>
+          </div>
+
+          <div class="bh-form-group">
+            <label class="bh-label">Select Owner *</label>
+            <select name="ownerId" class="bh-select" required>
+              <option value="">-- Choose an owner --</option>
+              <% owners.forEach(function(owner) { %>
+                <option value="<%= owner._id %>">
+                  <%= owner.user ? owner.user.name : 'Unknown' %> — <%= owner.user ? owner.user.email : '' %>
+                </option>
+                <% }) %>
+            </select>
+          </div>
+
+          <div style="display:flex;gap:0.75rem;margin-top:0.5rem;">
+            <button type="submit" class="btn-bh-primary" style="padding:0.85rem 2rem;font-size:1rem;">🔗 Assign
+              Now</button>
+            <a href="/admin/dashboard" class="btn-bh-outline" style="padding:0.85rem 1.5rem;">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

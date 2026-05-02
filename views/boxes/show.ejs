@@ -1,0 +1,191 @@
+<div class="row g-4">
+    <!-- Left: Details -->
+    <div class="col-lg-8">
+        <!-- Image Carousel -->
+        <% if (box.images && box.images.length> 0) { %>
+            <div id="boxCarousel" class="carousel slide mb-4 rounded overflow-hidden" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <% box.images.forEach(function(img, i) { %>
+                        <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+                            <img src="<%= img %>" class="d-block w-100" style="height:360px;object-fit:cover;"
+                                alt="<%= box.name %>" />
+                        </div>
+                        <% }) %>
+                </div>
+                <% if (box.images.length> 1) { %>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#boxCarousel"
+                        data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#boxCarousel"
+                        data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                    <% } %>
+            </div>
+            <% } else { %>
+                <div class="bh-card-placeholder rounded mb-4"
+                    style="height:280px;font-size:4rem;border-radius:14px!important;">🏏</div>
+                <% } %>
+
+                    <!-- Title -->
+                    <div class="mb-4">
+                        <h1 style="font-size:2rem;font-weight:800;margin-bottom:0.4rem;">
+                            <%= box.name %>
+                        </h1>
+                        <p style="color:var(--muted);margin-bottom:0.75rem;">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                                <circle cx="12" cy="10" r="3" />
+                            </svg>
+                            <%= box.location %>, <%= box.city %>
+                        </p>
+                        <% if (box.description) { %>
+                            <p style="color:var(--muted);line-height:1.7;">
+                                <%= box.description %>
+                            </p>
+                            <% } %>
+                    </div>
+
+                    <!-- Facilities -->
+                    <div class="bh-section mb-4">
+                        <div class="bh-section-head">
+                            <span class="bh-section-title">🏅 Facilities</span>
+                        </div>
+                        <div class="bh-section-body">
+                            <% if (box.facilities && box.facilities.length) { %>
+                                <div
+                                    style="display:grid;grid-template-columns:repeat(auto-fill, minmax(100px, 1fr));gap:0.75rem;">
+                                    <% const facilityEmojis={ 'Water' : '💧' , 'Parking' : '🅿️' , 'Washroom' : '🚻'
+                                        , 'CCTV' : '📹' , 'Change Room' : '👕' , 'Seating' : '🪑' , 'Power Backup' : '⚡'
+                                        , 'Equipment' : '🏏' , 'Lighting' : '💡' , 'Warm-Up Area' : '🏃' , 'First Aid'
+                                        : '🚑' }; %>
+                                        <% box.facilities.forEach(function(f) { %>
+                                            <div
+                                                style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 0.5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;text-align:center;">
+                                                <span style="font-size:1.5rem;line-height:1;">
+                                                    <%= facilityEmojis[f] || '✅' %>
+                                                </span>
+                                                <span style="font-size:0.8rem;color:var(--text);font-weight:600;">
+                                                    <%= f %>
+                                                </span>
+                                            </div>
+                                            <% }) %>
+                                </div>
+                                <% } else { %>
+                                    <p style="color:var(--muted);margin:0;">No facilities listed.</p>
+                                    <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Location -->
+                    <% if (box.latitude && box.longitude) { %>
+                        <div class="bh-section mb-4">
+                            <div class="bh-section-head"><span class="bh-section-title">📍 Location</span></div>
+                            <div class="bh-section-body">
+                                <a href="https://maps.google.com/?q=<%= box.latitude %>,<%= box.longitude %>"
+                                    target="_blank" class="btn-bh-outline"
+                                    style="display:inline-flex;align-items:center;gap:0.5rem;">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                                    </svg>
+                                    View on Google Maps
+                                </a>
+                            </div>
+                        </div>
+                        <% } %>
+    </div>
+
+    <!-- Right: Booking Card -->
+    <div class="col-lg-4">
+        <div class="bh-booking-card">
+            <div class="bh-price-big">₹<%= box.pricePerHour %><span>/hr</span></div>
+            <p style="color:var(--muted);font-size:0.82rem;margin:0.5rem 0 1.25rem;">per hour · no hidden charges</p>
+            <hr class="bh-divider" style="margin:1rem 0;" />
+
+            <% if (currentUser && currentUser.role==='user' ) { %>
+                <a href="/boxes/<%= box._id %>/book" class="btn-bh-primary"
+                    style="display:block;text-align:center;padding:0.9rem;font-size:1rem;">
+                    🏏 Book Now
+                </a>
+                <% } else if (!currentUser) { %>
+                    <a href="/auth/login" class="btn-bh-primary"
+                        style="display:block;text-align:center;padding:0.9rem;font-size:1rem;">
+                        Login to Book
+                    </a>
+                    <p style="font-size:0.78rem;color:var(--muted);text-align:center;margin-top:0.6rem;">
+                        <a href="/auth/register">Create free account →</a>
+                    </p>
+                    <% } else { %>
+                        <p style="text-align:center;color:var(--muted);font-size:0.85rem;">Only user accounts can book
+                            venues.</p>
+                        <% } %>
+
+                            <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border);">
+                                <div
+                                    style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem;font-size:0.82rem;color:var(--muted);">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path
+                                            d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2c0 7.3-8 11.8-8 11.8z" />
+                                    </svg>
+                                    <%= box.city %>
+                                </div>
+                                <div
+                                    style="display:flex;align-items:center;gap:0.6rem;font-size:0.82rem;color:var(--muted);">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                        <circle cx="9" cy="7" r="4" />
+                                    </svg>
+                                    Real-time slot availability
+                                </div>
+                                <% if (box.owner && box.owner.user) { %>
+                                    <div
+                                        style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border);">
+                                        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:0.25rem;">Managed
+                                            by <strong style="color:var(--text);">
+                                                <%= box.owner.user.name %>
+                                            </strong></p>
+                                        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:0;">📞 Contact:
+                                            <strong style="color:var(--text);">
+                                                <%= box.owner.phone %>
+                                            </strong>
+                                        </p>
+                                    </div>
+                                    <% } %>
+                            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nearby Venues -->
+<% if (nearby && nearby.length> 0) { %>
+    <hr class="bh-divider" style="margin:2.5rem 0;" />
+    <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:1.25rem;">More Venues in <%= box.city %>
+    </h3>
+    <div class="row row-cols-2 row-cols-md-4 g-3">
+        <% nearby.forEach(function(nb) { %>
+            <div class="col">
+                <div class="bh-card h-100">
+                    <% if (nb.images && nb.images.length> 0) { %>
+                        <img src="<%= nb.images[0] %>" class="bh-card-img" style="height:130px;" alt="<%= nb.name %>" />
+                        <% } else { %>
+                            <div class="bh-card-placeholder" style="height:130px;font-size:2rem;">🏏</div>
+                            <% } %>
+                                <div class="bh-card-body" style="padding:0.9rem;">
+                                    <div class="bh-card-title" style="font-size:0.9rem;">
+                                        <%= nb.name %>
+                                    </div>
+                                    <div class="bh-price" style="font-size:0.9rem;margin-bottom:0.6rem;">₹<%=
+                                            nb.pricePerHour %><span class="bh-price-unit">/hr</span></div>
+                                    <a href="/boxes/<%= nb._id %>" class="btn-bh-outline btn-bh-sm"
+                                        style="display:block;text-align:center;">View</a>
+                                </div>
+                </div>
+            </div>
+            <% }) %>
+    </div>
+    <% } %>

@@ -1,0 +1,88 @@
+<div class="bh-page-header">
+  <div>
+    <h1 class="bh-page-title">Manage Owners</h1>
+    <p style="color:var(--muted);margin-top:0.25rem;">
+      <%= owners.length %> owner<%= owners.length !==1 ? 's' : '' %> registered
+    </p>
+  </div>
+  <a href="/admin/owners/create" class="btn-bh-primary btn-bh-sm">+ Add Owner</a>
+</div>
+
+<div class="bh-section">
+  <% if (!owners || owners.length===0) { %>
+    <div class="bh-empty">
+      <span class="bh-empty-icon">👤</span>
+      No owners yet. <a href="/admin/owners/create">Add the first one →</a>
+    </div>
+    <% } else { %>
+      <div style="overflow-x:auto;">
+        <table class="bh-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Venues</th>
+              <th>Bank Details</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% owners.forEach(function(owner) { %>
+              <tr>
+                <td><strong>
+                    <%= owner.user ? owner.user.name : '—' %>
+                  </strong></td>
+                <td style="color:var(--muted);">
+                  <%= owner.user ? owner.user.email : '—' %>
+                </td>
+                <td>
+                  <span class="bh-badge confirmed">
+                    <%= owner.assignedBoxes ? owner.assignedBoxes.length : 0 %> venue<%= (owner.assignedBoxes &&
+                        owner.assignedBoxes.length !==1) ? 's' : '' %>
+                  </span>
+                </td>
+                <td style="color:var(--muted);font-size:0.82rem;">
+                  <% if (owner.bankDetails && owner.bankDetails.accountNumber) { %>
+                    ····<%= String(owner.bankDetails.accountNumber).slice(-4) %>
+                      <% } else { %>
+                        <span style="opacity:0.5;">Not set</span>
+                        <% } %>
+                </td>
+                <td>
+                  <div style="display:flex;gap:0.4rem;">
+                    <a href="/admin/owners/<%= owner._id %>/edit" class="btn-bh-outline btn-bh-sm">Edit</a>
+                    <form id="delete-form-<%= owner._id %>" action="/admin/owners/<%= owner._id %>?_method=DELETE"
+                      method="POST">
+                      <button class="btn-bh-danger btn-bh-sm" type="button"
+                        onclick="confirmDelete('<%= owner._id %>')">Delete</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <% } %>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  function confirmDelete(ownerId) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "This will permanently delete this owner and unassign all their venues!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ff4d4f',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete it!',
+      background: 'var(--bg2)',
+      color: 'var(--text)'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        document.getElementById('delete-form-' + ownerId).submit();
+      }
+    });
+  }
+</script>

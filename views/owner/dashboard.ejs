@@ -1,0 +1,151 @@
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="bh-auth-title" style="margin-bottom: 0; text-align: left;">Owner Dashboard</h1>
+    <div class="bh-card" style="padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem;">
+        <div style="font-size: 2rem;">💰</div>
+        <div>
+            <div style="color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                Confirmed Earnings</div>
+            <div style="font-size: 1.5rem; font-weight: 800; color: var(--green);">₹<%= earnings %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- My Venues -->
+<div class="bh-section mb-5">
+    <div class="bh-section-head">
+        <span class="bh-section-title">🏟️ My Venues (<%= boxes.length %>)</span>
+    </div>
+    <div class="bh-section-body">
+        <% if (!boxes.length) { %>
+            <p style="color: var(--muted); margin: 0;">No venues assigned to you yet.</p>
+            <% } else { %>
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <% boxes.forEach(function(box) { %>
+                        <div class="col">
+                            <div class="bh-card h-100">
+                                <% if (box.images && box.images.length> 0) { %>
+                                    <img src="<%= box.images[0] %>" alt="<%= box.name %>" class="bh-card-img"
+                                        style="height: 160px;" />
+                                    <% } else { %>
+                                        <div class="bh-card-placeholder" style="height: 160px; font-size: 2.5rem;">🏏
+                                        </div>
+                                        <% } %>
+
+                                            <div class="bh-card-body">
+                                                <h6
+                                                    style="font-weight: 700; font-size: 1.1rem; color: var(--text); margin-bottom: 0.3rem;">
+                                                    <%= box.name %>
+                                                </h6>
+                                                <p
+                                                    style="color: var(--muted); font-size: 0.85rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                    <svg width="14" height="14" fill="none" stroke="currentColor"
+                                                        stroke-width="2" viewBox="0 0 24 24">
+                                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                                                        <circle cx="12" cy="10" r="3" />
+                                                    </svg>
+                                                    <%= box.location %>, <%= box.city %>
+                                                </p>
+
+                                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                                    <div
+                                                        style="font-weight: 800; color: var(--green); font-size: 1.1rem;">
+                                                        ₹<%= box.pricePerHour %><span
+                                                                style="font-size: 0.8rem; color: var(--muted); font-weight: 500;">/hr</span>
+                                                    </div>
+                                                    <a href="/boxes/<%= box._id %>"
+                                                        class="btn-bh-outline btn-bh-sm">View Page</a>
+                                                </div>
+                                            </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+                <% } %>
+    </div>
+</div>
+
+<!-- Booking Requests -->
+<div class="bh-section">
+    <div class="bh-section-head">
+        <span class="bh-section-title">📅 Booking Requests</span>
+    </div>
+    <div class="bh-section-body" style="padding: 0;">
+        <% if (!bookings.length) { %>
+            <p style="color: var(--muted); padding: 1.5rem; margin: 0;">No bookings for your venues yet.</p>
+            <% } else { %>
+                <div class="table-responsive">
+                    <table class="bh-table">
+                        <thead>
+                            <tr>
+                                <th>Venue</th>
+                                <th>Customer</th>
+                                <th>Date & Time</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% bookings.forEach(function(b) { %>
+                                <% const statusColors={ pending: 'warning' , confirmed: 'success' , cancelled: 'danger'
+                                    , completed: 'secondary' }; %>
+                                    <tr>
+                                        <td style="font-weight: 500;">
+                                            <%= b.box ? b.box.name : 'N/A' %>
+                                        </td>
+                                        <td>
+                                            <div style="font-weight: 600;">
+                                                <%= b.user ? b.user.name : 'N/A' %>
+                                            </div>
+                                            <div style="font-size: 0.8rem; color: var(--muted);">
+                                                <%= b.user ? b.user.email : '' %>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style="font-weight: 600;">
+                                                <%= b.date %>
+                                            </div>
+                                            <div style="font-size: 0.8rem; color: var(--muted);">
+                                                <%= b.startTime %> – <%= b.endTime %>
+                                            </div>
+                                        </td>
+                                        <td style="font-weight: 700; color: var(--green);">
+                                            ₹<%= b.totalAmount %>
+                                        </td>
+                                        <td>
+                                            <span class="bh-badge <%= statusColors[b.status] || 'completed' %>">
+                                                <%= b.status %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                <% if (b.status==='confirmed' ) { %>
+                                                    <form action="/owner/bookings/<%= b._id %>/status" method="POST"
+                                                        class="m-0">
+                                                        <input type="hidden" name="status" value="completed" />
+                                                        <button class="btn-bh-outline btn-bh-sm"
+                                                            style="border-color: var(--green); color: var(--green);">Mark
+                                                            Complete</button>
+                                                    </form>
+                                                    <% } else if (b.status==='pending' ) { %>
+                                                        <form action="/owner/bookings/<%= b._id %>/status" method="POST"
+                                                            class="m-0">
+                                                            <input type="hidden" name="status" value="cancelled" />
+                                                            <button class="btn-bh-outline btn-bh-sm"
+                                                                style="border-color: #ef4444; color: #ef4444;">Reject</button>
+                                                        </form>
+                                                        <% } else { %>
+                                                            <span
+                                                                style="color: var(--muted); font-size: 0.85rem;">—</span>
+                                                            <% } %>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <% } %>
+    </div>
+</div>

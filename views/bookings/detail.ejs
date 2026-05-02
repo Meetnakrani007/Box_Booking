@@ -1,0 +1,104 @@
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="d-flex align-items-center justify-content-between mb-4 mt-2">
+            <h1 class="bh-auth-title" style="margin-bottom:0; font-size: 1.8rem; text-align: left;">Booking Details</h1>
+            <% const statusColors={ pending: 'warning' , confirmed: 'success' , cancelled: 'danger' ,
+                completed: 'secondary' }; %>
+                <span class="bh-badge bh-badge-<%= statusColors[booking.status] || 'secondary' %>"
+                    style="font-size: 0.8rem; padding: 6px 12px;">
+                    <%= booking.status.toUpperCase() %>
+                </span>
+        </div>
+
+        <div class="bh-card">
+            <!-- Venue Head -->
+            <div style="padding: 1.5rem; border-bottom: 1px solid var(--border); background: var(--bg3);">
+                <h4 style="font-weight: 800; color: var(--text); margin-bottom: 0.4rem; font-size: 1.3rem;">
+                    <%= booking.box.name %>
+                </h4>
+                <div style="color: var(--muted); font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    <%= booking.box.location %>, <%= booking.box.city %>
+                </div>
+            </div>
+
+            <!-- Booking Data -->
+            <div style="padding: 1.5rem;">
+                <div class="row g-4 mb-4">
+                    <div class="col-6">
+                        <div
+                            style="color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem;">
+                            Date</div>
+                        <div
+                            style="font-weight: 600; color: var(--text); font-size: 1rem; display:flex; align-items:center; gap:0.4rem;">
+                            📅 <%= booking.date %>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div
+                            style="color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem;">
+                            Time</div>
+                        <div
+                            style="font-weight: 600; color: var(--text); font-size: 1rem; display:flex; align-items:center; gap:0.4rem;">
+                            ⏰ <%= booking.startTime %> – <%= booking.endTime %>
+                        </div>
+                    </div>
+
+                    <div class="col-12 mt-4 pt-4" style="border-top: 1px dashed rgba(255,255,255,0.1);"></div>
+
+                    <div class="col-6">
+                        <div
+                            style="color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem;">
+                            Total Amount</div>
+                        <div style="font-weight: 800; color: var(--green); font-size: 1.4rem;">
+                            ₹<%= booking.totalAmount %>
+                        </div>
+                    </div>
+
+                    <% if (booking.paymentId) { %>
+                        <div class="col-6">
+                            <div
+                                style="color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem;">
+                                Payment ID</div>
+                            <div
+                                style="font-family: monospace; color: var(--muted); font-size: 0.9rem; background: rgba(255,255,255,0.03); padding: 0.4rem 0.6rem; border-radius: 6px; display: inline-block; border: 1px solid var(--border);">
+                                <%= booking.paymentId %>
+                            </div>
+                        </div>
+                        <% } %>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-3 flex-wrap mt-5">
+                    <% if (booking.status==='pending' ) { %>
+                        <a href="/bookings/<%= booking._id %>/pay" class="btn-bh-primary w-100 text-center py-3"
+                            style="font-size:1rem;">
+                            Proceed to Pay ₹<%= booking.totalAmount %> →
+                        </a>
+                        <form action="/bookings/<%= booking._id %>/cancel" method="POST" class="w-100 m-0"
+                            onsubmit="return confirm('Cancel this booking request?')">
+                            <button type="submit" class="btn-bh-outline w-100 py-3"
+                                style="border-color: rgba(239,68,68,0.4); color: var(--danger);">Cancel Booking</button>
+                        </form>
+                        <% } else if (booking.status==='confirmed' ) { %>
+                            <form action="/bookings/<%= booking._id %>/cancel" method="POST" class="w-100 m-0"
+                                onsubmit="return confirm('Are you sure you want to cancel this confirmed booking?')">
+                                <button type="submit" class="btn-bh-outline w-100 py-3"
+                                    style="border-color: rgba(239,68,68,0.4); color: var(--danger);">Cancel Confirmed
+                                    Booking</button>
+                            </form>
+                            <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="/user/dashboard"
+                style="color: var(--green); font-size: 0.9rem; font-weight: 500; text-decoration: none;">← Back to My
+                Bookings</a>
+        </div>
+    </div>
+</div>

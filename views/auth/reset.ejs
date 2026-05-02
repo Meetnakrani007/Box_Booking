@@ -1,0 +1,52 @@
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="bh-auth-card">
+            <div style="text-align:center;margin-bottom:1.5rem;">
+                <div style="font-size:3rem;margin-bottom:0.5rem;">🔓</div>
+                <h2 class="bh-auth-title">Create New Password</h2>
+                <p class="bh-auth-subtitle">Enter the 6-digit code sent to <strong style="color:var(--text);">
+                        <%= email %>
+                    </strong> and your new password.</p>
+            </div>
+
+            <form action="/auth/reset" method="POST">
+                <input type="hidden" name="email" value="<%= email %>" />
+
+                <div class="mb-4">
+                    <label class="bh-label">6-Digit Reset Code</label>
+                    <input type="text" name="otp" class="bh-input"
+                        style="font-size: 1.5rem; letter-spacing: 0.5rem; font-weight: 700; text-align: center;"
+                        placeholder="------" maxlength="6" required autocomplete="off" autofocus />
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="bh-label">New Password</label>
+                    <input type="password" id="password" name="password" class="bh-input" required minlength="6" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="confirmPassword" class="bh-label">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" class="bh-input" required
+                        minlength="6" />
+                </div>
+
+                <button type="submit" class="btn-bh-success w-100 py-3" style="font-size: 1rem;">Reset Password</button>
+            </form>
+
+            <div class="mt-4 text-center">
+                <a href="/auth/forgot" class="btn-bh-link" style="font-size: 0.85rem; color: var(--muted);">Didn't
+                    receive code? Request again</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Just a tiny script to restrict OTP input to numbers
+    const otpInput = document.querySelector('input[name="otp"]');
+    if (otpInput) {
+        otpInput.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    }
+</script>

@@ -1,0 +1,80 @@
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <h1 class="bh-page-title mb-1">My Profile</h1>
+        <p style="color:var(--muted);margin-bottom:2rem;">Update your account information</p>
+
+        <div class="bh-section">
+            <div class="bh-section-head"><span class="bh-section-title">Account Details</span></div>
+            <div class="bh-section-body">
+                <form action="/user/profile" method="POST">
+                    <div class="bh-form-group">
+                        <label class="bh-label">Full Name</label>
+                        <input type="text" name="name" class="bh-input" value="<%= currentUser.name %>" required />
+                    </div>
+                    <div class="bh-form-group">
+                        <label class="bh-label">Email Address</label>
+                        <input type="email" class="bh-input" value="<%= currentUser.email %>" disabled />
+                        <small style="color:var(--muted);font-size:0.75rem;">Email cannot be changed.</small>
+                    </div>
+
+                    <hr class="bh-divider" />
+                    <p
+                        style="color:var(--muted);font-size:0.82rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1rem;">
+                        Change Password <span style="opacity:0.6;">(optional)</span></p>
+
+                    <div class="bh-form-group">
+                        <label class="bh-label">Current Password</label>
+                        <div class="bh-input-group">
+                            <input type="password" name="currentPassword" class="bh-input" id="curPw"
+                                placeholder="••••••••" />
+                            <button type="button" class="bh-eye-btn" onclick="togglePw('curPw',this)">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bh-form-group">
+                        <label class="bh-label">New Password</label>
+                        <div class="bh-input-group">
+                            <input type="password" name="newPassword" class="bh-input" id="newPw"
+                                placeholder="Min 6 characters" minlength="6" />
+                            <button type="button" class="bh-eye-btn" onclick="togglePw('newPw',this)">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-bh-primary" style="width:100%;padding:0.85rem;">Save
+                        Changes</button>
+                </form>
+            </div>
+        </div>
+        <div style="margin-top:1rem;">
+            <a href="/user/dashboard"
+                style="color:var(--muted);font-size:0.85rem;display:inline-flex;align-items:center;gap:0.4rem;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M19 12H5M12 5l-7 7 7 7" />
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePw(id, btn) {
+        const inp = document.getElementById(id);
+        const isText = inp.type === 'text';
+        inp.type = isText ? 'password' : 'text';
+        btn.innerHTML = isText
+            ? '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
+            : '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+    }
+</script>

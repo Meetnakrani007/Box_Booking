@@ -1,0 +1,72 @@
+<!-- Stats -->
+<div class="bh-page-header">
+  <div>
+    <h1 class="bh-page-title">Admin Dashboard</h1>
+    <p style="color:var(--muted);margin-top:0.25rem;">Platform overview</p>
+  </div>
+  <a href="/admin/boxes/create" class="btn-bh-primary btn-bh-sm">+ New Venue</a>
+</div>
+
+<div class="row g-3 mb-5">
+  <div class="col-md-4">
+    <div class="bh-stat">
+      <div class="bh-stat-icon blue">👥</div>
+      <div>
+        <div class="bh-stat-value">
+          <%= stats.userCount %>
+        </div>
+        <div class="bh-stat-label">Total Users</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="bh-stat">
+      <div class="bh-stat-icon gold">👤</div>
+      <div>
+        <div class="bh-stat-value">
+          <%= stats.ownerCount %>
+        </div>
+        <div class="bh-stat-label">Venue Owners</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="bh-stat">
+      <div class="bh-stat-icon green">🏟️</div>
+      <div>
+        <div class="bh-stat-value">
+          <%= stats.boxCount %>
+        </div>
+        <div class="bh-stat-label">Venues Listed</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem;color:var(--text);">Quick Actions</h3>
+<div class="row g-3">
+  <% const actions=[ { href:'/admin/owners', icon:'👤', label:'Manage Owners', desc:'View, edit, delete owners' }, {
+    href:'/admin/owners/create', icon:'➕', label:'Add Owner', desc:'Create a new owner account' }, {
+    href:'/admin/boxes', icon:'🏟️', label:'Manage Venues', desc:'View, edit, delete venues' }, {
+    href:'/admin/boxes/create', icon:'🏗️', label:'Add Venue', desc:'List a new box cricket venue' }, {
+    href:'/admin/boxes/assign', icon:'🔗', label:'Assign Venue', desc:'Link a venue to an owner' }, {
+    href:'/admin/revenue', icon:'💰', label:'Revenue', desc:'View platform revenue and owner payouts' } ]; %>
+    <% actions.forEach(function(a) { %>
+      <div class="col-md-4 col-lg-3">
+        <a href="<%= a.href %>" style="text-decoration:none;display:block;">
+          <div class="bh-card" style="padding:1.25rem;cursor:pointer;">
+            <div style="font-size:1.75rem;margin-bottom:0.5rem;">
+              <%= a.icon %>
+            </div>
+            <div style="font-weight:700;color:var(--text);font-size:0.95rem;">
+              <%= a.label %>
+            </div>
+            <div style="color:var(--muted);font-size:0.78rem;margin-top:0.2rem;">
+              <%= a.desc %>
+            </div>
+          </div>
+        </a>
+      </div>
+      <% }) %>
+</div>

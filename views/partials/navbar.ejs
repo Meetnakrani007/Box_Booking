@@ -1,0 +1,69 @@
+<nav class="bh-nav navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="/">🏏 Box<span>Hook</span></a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      style="color:var(--muted)">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M3 12h18M3 6h18M3 18h18" />
+      </svg>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-3 gap-1">
+        <li class="nav-item">
+          <a class="nav-link" href="/boxes">Find Venues</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/boxes/map">🗺️ Map View</a>
+        </li>
+        <% if (currentUser) { %>
+          <% if (currentUser.role==='user' ) { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/user/dashboard">My Bookings</a>
+            </li>
+            <% } %>
+              <% if (currentUser.role==='owner' ) { %>
+                <li class="nav-item">
+                  <a class="nav-link" href="/owner/dashboard">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/owner/revenue">💰 Revenue</a>
+                </li>
+                <% } %>
+                  <% if (currentUser.role==='admin' ) { %>
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="adminDrop" role="button"
+                        data-bs-toggle="dropdown">Admin</a>
+                      <ul class="dropdown-menu" aria-labelledby="adminDrop">
+                        <li><a class="dropdown-item" href="/admin/dashboard">📊 Dashboard</a></li>
+                        <li><a class="dropdown-item" href="/admin/revenue">💰 Revenue</a></li>
+                        <li><a class="dropdown-item" href="/admin/owners">👤 Owners</a></li>
+                        <li><a class="dropdown-item" href="/admin/boxes">🏟️ Venues</a></li>
+                        <li><a class="dropdown-item" href="/admin/boxes/assign">🔗 Assign Venue</a></li>
+                      </ul>
+                    </li>
+                    <% } %>
+                      <% } %>
+      </ul>
+      <div class="d-flex align-items-center gap-3">
+        <% if (!currentUser) { %>
+          <a href="/auth/login" class="btn-bh-outline btn-bh-sm" style="display:inline-block;">Login</a>
+          <a href="/auth/register" class="btn-bh-primary btn-bh-sm" style="display:inline-block;">Register Free</a>
+          <% } else { %>
+            <div class="bh-user-chip">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+              </svg>
+              <%= currentUser.name %>
+                <span class="bh-role-badge <%= currentUser.role %>">
+                  <%= currentUser.role %>
+                </span>
+            </div>
+            <form action="/auth/logout" method="POST" class="d-inline">
+              <button class="btn-bh-outline btn-bh-sm" type="submit">Logout</button>
+            </form>
+            <% } %>
+      </div>
+    </div>
+  </div>
+</nav>

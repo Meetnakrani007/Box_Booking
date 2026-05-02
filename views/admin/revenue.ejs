@@ -1,0 +1,347 @@
+<div class="bh-page-header">
+    <div>
+        <h1 class="bh-page-title">Platform Revenue Dashboard</h1>
+        <p style="color:var(--muted);margin-top:0.25rem;">Analytics & simulated payment splits</p>
+    </div>
+</div>
+
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <label for="dateFilter" class="form-label mb-1" style="font-size:0.85rem;color:var(--muted);">Filter by
+            Date</label>
+        <select id="dateFilter" class="bh-select" style="max-width: 200px;" onchange="fetchRevenueData()">
+            <option value="last15days">Last 15 Days</option>
+            <option value="last30days" selected>Last 30 Days</option>
+            <option value="currentMonth">Current Month</option>
+            <option value="previousMonth">Previous Month</option>
+            <option value="currentYear">Current Year</option>
+            <option value="all">All Time</option>
+        </select>
+    </div>
+</div>
+
+<div class="row g-3 mb-5">
+    <div class="col-md-3">
+        <div class="bh-stat">
+            <div class="bh-stat-icon green">💰</div>
+            <div>
+                <div class="bh-stat-value" id="stat-commission">₹0</div>
+                <div class="bh-stat-label">Platform Commission</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="bh-stat">
+            <div class="bh-stat-icon gold">📈</div>
+            <div>
+                <div class="bh-stat-value" id="stat-gross">₹0</div>
+                <div class="bh-stat-label">Gross Revenue</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="bh-stat">
+            <div class="bh-stat-icon blue">📅</div>
+            <div>
+                <div class="bh-stat-value" id="stat-bookings">0</div>
+                <div class="bh-stat-label">Total Bookings</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="bh-stat">
+            <div class="bh-stat-icon" style="background:rgba(139,157,183,0.12);">🏦</div>
+            <div>
+                <div class="bh-stat-value" id="stat-cash">₹0</div>
+                <div class="bh-stat-label">Admin Cash Holding</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- Chart -->
+    <div class="col-lg-8">
+        <div class="bh-card p-4 h-100">
+            <h5 style="margin-bottom: 1rem; font-weight: 600;">Revenue Over Time</h5>
+            <canvas id="revenueChart" style="max-height: 300px;"></canvas>
+        </div>
+    </div>
+
+    <!-- Owner Earnings & Payout Action -->
+    <div class="col-lg-12">
+        <div class="bh-card p-4">
+            <h5 style="margin-bottom: 1rem; font-weight: 600;">Owner Earnings & Payouts</h5>
+            <div class="table-responsive">
+                <table class="bh-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Owner Name</th>
+                            <th>Earned (91%)</th>
+                            <th>Period Earnings</th>
+                            <th>Total Paid</th>
+                            <th>Pending Balance</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ownerEarningsTableBody">
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-3">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-xl-6">
+        <div class="bh-card p-4 h-100">
+            <h5 style="margin-bottom: 1rem; font-weight: 600;">Recent Transactions</h5>
+            <div class="table-responsive">
+                <table class="bh-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Gross</th>
+                            <th>Commission</th>
+                            <th>Owner Share</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTableBody">
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="bh-card p-4 h-100">
+            <h5 style="margin-bottom: 1rem; font-weight: 600;">Recent Payouts (Admin -> Owner)</h5>
+            <div class="table-responsive">
+                <table class="bh-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Owner Name</th>
+                            <th>Amount Paid</th>
+                            <th>Ref</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payoutTableBody">
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="payoutModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content"
+            style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--border);">
+                <h5 class="modal-title" style="color:var(--text); font-weight:700;">Issue Payout</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <form id="payoutForm" action="/admin/revenue/payout" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="ownerId" id="payoutOwnerId">
+
+                    <div class="mb-3">
+                        <label
+                            style="color:var(--muted); font-size:0.85rem; font-weight:600; text-transform:uppercase;">Paying
+                            To</label>
+                        <div id="payoutOwnerNameDisplay" style="color:var(--text); font-size:1.1rem; font-weight:600;">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label
+                            style="color:var(--muted); font-size:0.85rem; font-weight:600; text-transform:uppercase;">Pending
+                            Balance</label>
+                        <div id="payoutPendingBalanceDisplay"
+                            style="color:var(--gold); font-size:1.1rem; font-weight:700;"></div>
+                    </div>
+
+                    <div class="bh-form-group">
+                        <label class="bh-label">Amount to Pay (₹)</label>
+                        <input type="number" name="amount" class="bh-input" id="payoutAmountInput" required min="1"
+                            step="1">
+                    </div>
+
+                    <div class="bh-form-group">
+                        <label class="bh-label">Reference / Note (Optional)</label>
+                        <input type="text" name="reference" class="bh-input" placeholder="e.g. UTR Number">
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--border);">
+                    <button type="button" class="btn-bh-outline" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn-bh-primary" onclick="confirmPayout()">Submit Payout</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Include SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function confirmPayout() {
+        const amount = document.getElementById('payoutAmountInput').value;
+        const ownerName = document.getElementById('payoutOwnerNameDisplay').innerText;
+
+        if (!amount || amount <= 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Amount',
+                text: 'Please enter a valid amount to pay.',
+                background: 'var(--bg2)',
+                color: 'var(--text)'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Confirm Payout',
+            text: `Are you sure you want to process a payout of ₹${amount} to ${ownerName}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, process payout',
+            background: 'var(--bg2)',
+            color: 'var(--text)'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('payoutForm').submit();
+            }
+        });
+    }
+
+    let revenueChartInstance = null;
+
+    function openPayoutModal(ownerId, ownerName, pendingBalance) {
+        document.getElementById('payoutOwnerId').value = ownerId;
+        document.getElementById('payoutOwnerNameDisplay').innerText = ownerName;
+        document.getElementById('payoutPendingBalanceDisplay').innerText = `₹${pendingBalance}`;
+
+        // Default the input to the full pending balance
+        document.getElementById('payoutAmountInput').value = pendingBalance;
+        document.getElementById('payoutAmountInput').max = pendingBalance;
+
+        const payoutModal = new bootstrap.Modal(document.getElementById('payoutModal'));
+        payoutModal.show();
+    }
+
+    async function fetchRevenueData() {
+        const filter = document.getElementById('dateFilter').value;
+        try {
+            const res = await fetch(`/admin/api/revenue?filter=${filter}`);
+            const data = await res.json();
+
+            // Update Stats
+            document.getElementById('stat-commission').innerText = `₹${data.totalCommission}`;
+            document.getElementById('stat-gross').innerText = `₹${data.totalGrossRevenue}`;
+            document.getElementById('stat-bookings').innerText = data.totalBookings;
+            document.getElementById('stat-cash').innerText = `₹${data.adminCashHolding}`;
+
+            // Update Owner list Table
+            const tbodyOwner = document.getElementById('ownerEarningsTableBody');
+            if (data.ownerEarnings.length === 0) {
+                tbodyOwner.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">No owners found.</td></tr>';
+            } else {
+                tbodyOwner.innerHTML = data.ownerEarnings.map(o => `
+                    <tr>
+                        <td style="font-weight:600; color:var(--text);">${o.name}</td>
+                        <td>₹${o.totalEarnings}</td>
+                        <td style="color:var(--muted); font-size:0.85rem;">₹${o.periodEarnings}</td>
+                        <td style="color:#10b981;">₹${o.totalPaid}</td>
+                        <td style="color:var(--gold); font-weight:700;">₹${o.pendingBalance}</td>
+                        <td>
+                            ${o.pendingBalance > 0
+                        ? `<button class="btn btn-sm btn-bh-primary py-1 px-3" onclick="openPayoutModal('${o.id}', '${o.name}', ${o.pendingBalance})">Pay</button>`
+                        : `<span class="badge bg-secondary">Settled</span>`
+                    }
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Update Chart
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            if (revenueChartInstance) {
+                revenueChartInstance.destroy();
+            }
+            revenueChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.chart.labels,
+                    datasets: [{
+                        label: 'Platform Commission (₹)',
+                        data: data.chart.data,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Update Transactions Table
+            const tbodyTx = document.getElementById('transactionTableBody');
+            if (data.recentTransactions.length === 0) {
+                tbodyTx.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No transactions found</td></tr>';
+            } else {
+                tbodyTx.innerHTML = data.recentTransactions.map(t => `
+                    <tr>
+                        <td>${new Date(t.paymentDate).toLocaleDateString()}</td>
+                        <td>₹${t.totalAmount}</td>
+                        <td style="color:#10b981;font-weight:600;">₹${t.commissionAmount}</td>
+                        <td>₹${t.ownerAmount}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // Update Payouts Table
+            const tbodyPayout = document.getElementById('payoutTableBody');
+            if (data.recentPayouts.length === 0) {
+                tbodyPayout.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No payouts issued yet</td></tr>';
+            } else {
+                tbodyPayout.innerHTML = data.recentPayouts.map(p => `
+                    <tr>
+                        <td>${new Date(p.paymentDate).toLocaleDateString()}</td>
+                        <td><span style="font-weight:600; color:var(--text);">${p.owner && p.owner.user ? p.owner.user.name : 'Unknown'}</span></td>
+                        <td style="color:var(--danger);font-weight:600;">-₹${p.amount}</td>
+                        <td><span style="font-family:monospace;font-size:0.8rem;color:var(--muted);">${p.reference || 'N/A'}</span></td>
+                    </tr>
+                `).join('');
+            }
+
+        } catch (err) {
+            console.error('Error fetching data:', err);
+        }
+    }
+
+    // Load initial data
+    document.addEventListener('DOMContentLoaded', fetchRevenueData);
+</script>

@@ -1,0 +1,61 @@
+<h1 class="bh-auth-title" style="margin-bottom: 2rem; text-align: left;">Edit Owner</h1>
+
+<form action="/admin/owners/<%= owner._id %>?_method=PUT" method="POST">
+    <div class="row">
+        <!-- Account Details -->
+        <div class="col-md-6 mb-4">
+            <h5
+                style="color:var(--muted); font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                Account Details</h5>
+            <div class="mb-3">
+                <label class="bh-label">Name</label>
+                <input type="text" name="name" class="bh-input" value="<%= owner.user.name %>" required />
+            </div>
+            <div class="mb-3">
+                <label class="bh-label">Email</label>
+                <input type="email" class="bh-input" value="<%= owner.user.email %>" disabled
+                    style="background: var(--surface); color: var(--muted); cursor: not-allowed;" />
+                <small style="color: var(--muted); font-size: 0.8rem; display: block; margin-top: 0.3rem;">Email cannot
+                    be changed.</small>
+            </div>
+            <div class="mb-3">
+                <label class="bh-label">Phone Number *</label>
+                <input type="text" name="phone" class="bh-input" value="<%= owner.phone %>" required />
+            </div>
+        </div>
+
+        <!-- Bank Details -->
+        <div class="col-md-6 mb-4">
+            <h5
+                style="color:var(--muted); font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                Bank Details</h5>
+            <div class="mb-3">
+                <label class="bh-label">Account Name</label>
+                <input type="text" name="accountName" class="bh-input"
+                    value="<%= owner.bankDetails?.accountName || '' %>" />
+            </div>
+            <div class="mb-3">
+                <label class="bh-label">Account Number</label>
+                <input type="text" name="accountNumber" class="bh-input"
+                    value="<%= owner.bankDetails?.accountNumber || '' %>" />
+            </div>
+            <div class="mb-3">
+                <label class="bh-label">IFSC Code</label>
+                <input type="text" name="ifsc" class="bh-input" value="<%= owner.bankDetails?.ifsc || '' %>" />
+            </div>
+            <div class="mb-3">
+                <label class="bh-label">Bank Name</label>
+                <input type="text" name="bankName" class="bh-input" value="<%= owner.bankDetails?.bankName || '' %>" />
+            </div>
+            <div class="mb-3">
+                <label class="bh-label">UPI ID</label>
+                <input type="text" name="upiId" class="bh-input" value="<%= owner.bankDetails?.upiId || '' %>" />
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-3 mt-4">
+        <button type="submit" class="btn-bh-primary px-4">Update Owner</button>
+        <a href="/admin/owners" class="btn-bh-outline px-4">Cancel</a>
+    </div>
+</form>

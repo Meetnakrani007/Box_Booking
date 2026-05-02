@@ -1,0 +1,51 @@
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="bh-auth-card">
+            <div style="text-align:center;margin-bottom:1.5rem;">
+                <div style="font-size:3rem;margin-bottom:0.5rem;">✉️</div>
+                <h2 class="bh-auth-title">Verify Email</h2>
+                <p class="bh-auth-subtitle">We sent a 6-digit code to <strong style="color:var(--text);">
+                        <%= email || 'your email' %>
+                    </strong></p>
+            </div>
+
+            <form action="/auth/verify-email" method="POST">
+                <input type="hidden" name="email" value="<%= email %>" />
+
+                <div class="mb-4">
+                    <label class="bh-label text-center d-block">Enter Verification Code</label>
+                    <input type="text" name="otp" class="bh-input text-center"
+                        style="font-size: 2rem; letter-spacing: 0.5rem; font-weight: 700; padding: 1rem;"
+                        placeholder="------" maxlength="6" required autocomplete="off" />
+                </div>
+
+                <button type="submit" class="btn-bh-primary w-100 py-3" style="font-size: 1rem;">Verify & Log
+                    In</button>
+            </form>
+
+            <div style="margin-top:2rem;text-align:center;">
+                <p style="color:var(--muted);font-size:0.9rem;margin-bottom:0.8rem;">Didn't receive the code?</p>
+                <form action="/auth/resend-otp" method="POST">
+                    <input type="hidden" name="email" value="<%= email %>" />
+                    <button type="submit" class="btn-bh-link m-0 p-0 border-0 bg-transparent">Resend Code</button>
+                </form>
+            </div>
+
+            <div class="mt-4 text-center">
+                <a href="/auth/login" class="btn-bh-link" style="font-size: 0.85rem; color: var(--muted);">← Back to
+                    Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Just a tiny script to auto-focus and restrict to numbers
+    const otpInput = document.querySelector('input[name="otp"]');
+    if (otpInput) {
+        otpInput.focus();
+        otpInput.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    }
+</script>
