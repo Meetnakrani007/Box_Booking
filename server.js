@@ -131,5 +131,11 @@ app.use((err, req, res, next) => {
   res.status(500).render('error/500', { title: 'Server Error' });
 });
 
-const PORT = process.env.BACKEND_PORT || process.env.PORT || 9090;
-app.listen(PORT, () => console.log(`BoxHook running at http://localhost:${PORT}`));
+// ─── Start server locally (skipped on Vercel) ──────────────────────────────
+if (!process.env.VERCEL) {
+  const PORT = process.env.BACKEND_PORT || process.env.PORT || 9090;
+  app.listen(PORT, () => console.log(`BoxHook running at http://localhost:${PORT}`));
+}
+
+// Export for Vercel serverless
+module.exports = app;
